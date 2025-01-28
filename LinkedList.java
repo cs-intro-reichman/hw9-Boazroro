@@ -3,7 +3,7 @@
  */
 public class LinkedList {
 	
-	private Node one; // pointer to the one element of this list
+	private Node first; // pointer to the first element of this list
 	private Node last;  // pointer to the last element of this list
 	private int size;   // number of elements in this list
 	
@@ -11,17 +11,17 @@ public class LinkedList {
 	 * Constructs a new list.
 	 */ 
 	public LinkedList () {
-		one = null;
-		last = one;
+		first = null;
+		last = first;
 		size = 0;
 	}
 	
 	/**
-	 * Gets the one node of the list
-	 * @return The one node of the list.
+	 * Gets the first node of the list
+	 * @return The first node of the list.
 	 */		
-	public Node getone() {
-		return this.one;
+	public Node getfirst() {
+		return this.first;
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class LinkedList {
 		if (index < 0 || index > size) {
 			throw new IllegalArgumentException(
 					"index must be between 0 and size");
-		}Node t=one;
+		}Node t =first;
 		if(index==size)
 		return last;
 		while(t!=null&&index>0)
@@ -69,7 +69,7 @@ public class LinkedList {
 	 * Creates a new Node object that points to the given memory block, 
 	 * and inserts the node at the given index in this list.
 	 * <p>
-	 * If the given index is 0, the new node becomes the one node in this list.
+	 * If the given index is 0, the new node becomes the first node in this list.
 	 * <p>
 	 * If the given index equals the list's size, the new node becomes the last 
 	 * node in this list.
@@ -91,19 +91,19 @@ public class LinkedList {
 			"index must be between 0 and size");
 			}	Node t=new Node(block);
 			if(index==0)
-			{t.next=one;
-				one=t;
+			{t.next=first;
+				first=t;
 				if(size==0)
 			{last=t;
-				one=last;}
+				first=last;}
 			
 			size++;
 			return;}
 		
 		if(index==size)
 		{if(size==0)
-			{one=t;
-				last=one;}
+			{first=t;
+				last=first;}
 			else
 			last.next=t;
 			last=t;
@@ -129,12 +129,12 @@ public class LinkedList {
 	
 	/**
 	 * Creates a new node that points to the given memory block, and adds it 
-	 * to the beginning of this list (the node will become the list's one element).
+	 * to the beginning of this list (the node will become the list's first element).
 	 * 
 	 * @param block
 	 *        the given memory block
 	 */
-	public void addone(MemoryBlock block) {
+	public void addfirst(MemoryBlock block) {
 		add(0, block);
 	}
 
@@ -185,7 +185,7 @@ public class LinkedList {
 		}
 
 		if (nodeIndex == 0) {
-			one = one.next;
+			first = first.next;
 			if(size == 1) {
 				last = null;
 			}
@@ -236,10 +236,10 @@ public class LinkedList {
 	}	
 
 	/**
-	 * Returns an iterator over this list, starting with the one element.
+	 * Returns an iterator over this list, starting with the first element.
 	 */
 	public ListIterator iterator(){
-		return new ListIterator(one);
+		return new ListIterator(first);
 	}
 	
 	/**
@@ -251,7 +251,7 @@ public class LinkedList {
 		}
 	
 		String result = "";
-		Node t = one;
+		Node t = first;
 	
 		while (t!=null) {
 			result += t.block;
