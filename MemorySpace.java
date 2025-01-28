@@ -6,32 +6,32 @@
 public class MemorySpace {
 	
 	// A list of the memory blocks that are presently allocated
-	private LinkedList allocatedList;
+	private LinkedList killerList;
 
 	// A list of memory blocks that are presently free
-	private LinkedList freeList;
+	private LinkedList hinamList;
 
 	/**
 	 * Constructs a new managed memory space of a given maximal size.
 	 * 
-	 * @param maxSize
+	 * @param sizeMaximum
 	 *            the size of the memory space to be managed
 	 */
-	public MemorySpace(int maxSize) {
+	public MemorySpace(int sizeMaximum) {
 		// initiallizes an empty list of allocated blocks.
-		allocatedList = new LinkedList();
+		killerList = new LinkedList();
 	    // Initializes a free list containing a single block which represents
 	    // the entire memory. The base address of this single initial block is
 	    // zero, and its length is the given memory size.
-		freeList = new LinkedList();
-		freeList.addLast(new MemoryBlock(0, maxSize));
+		hinamList = new LinkedList();
+		hinamList.addLast(new MemoryBlock(0, sizeMaximum));
 	}
 
 	/**
 	 * Allocates a memory block of a requested length (in words). Returns the
 	 * base address of the allocated block, or -1 if unable to allocate.
 	 * 
-	 * This implementation scans the freeList, looking for the first free memory block 
+	 * This implementation scans the hinamList, looking for the first free memory block 
 	 * whose length equals at least the given length. If such a block is found, the method 
 	 * performs the following operations:
 	 * 
@@ -39,7 +39,7 @@ public class MemorySpace {
 	 * the base address of the found free block. The length of the new block is set to the value 
 	 * of the method's length parameter.
 	 * 
-	 * (2) The new memory block is appended to the end of the allocatedList.
+	 * (2) The new memory block is appended to the end of the killerList.
 	 * 
 	 * (3) The base address and the length of the found free block are updated, to reflect the allocation.
 	 * For example, suppose that the requested block length is 17, and suppose that the base
@@ -51,7 +51,7 @@ public class MemorySpace {
 	 * (4) The new memory block is returned.
 	 * 
 	 * If the length of the found block is exactly the same as the requested length, 
-	 * then the found block is removed from the freeList and appended to the allocatedList.
+	 * then the found block is removed from the hinamList and appended to the killerList.
 	 * 
 	 * @param length
 	 *        the length (in words) of the memory block that has to be allocated
@@ -59,19 +59,19 @@ public class MemorySpace {
 	 */
 	public int malloc(int length) {		
 	
-		Node t=freeList.getFirst();
-		for(int i = 0; i < freeList.getSize(); i++){
+		Node t=hinamList.getFirst();
+		for(int i = 0; i < hinamList.getSize(); i++){
 			MemoryBlock freeBlock = t.block;
 			if(freeBlock.length >= length) {
-				MemoryBlock newBlock = new MemoryBlock(freeBlock.baseAddress, length);
-				allocatedList.addLast(newBlock);
+				MemoryBlock systBlock = new MemoryBlock(freeBlock.baseAddress, length);
+				killerList.addLast(systBlock);
 				if (freeBlock.length == length) {
-					freeList.remove(freeBlock);
+					hinamList.remove(freeBlock);
 				}
 				else { 
 					freeBlock.baseAddress += length;
 					freeBlock.length -= length;
-				}return newBlock.baseAddress;
+				}return systBlock.baseAddress;
 		
 		}t = t.next;
 	}
@@ -80,22 +80,22 @@ public class MemorySpace {
 	/**
 	 * Frees the memory block whose base address equals the given address.
 	 * This implementation deletes the block whose base address equals the given 
-	 * address from the allocatedList, and adds it at the end of the free list. 
+	 * address from the killerList, and adds it at the end of the free list. 
 	 * 
 	 * @param baseAddress
-	 *            the starting address of the block to freeList
+	 *            the starting address of the block to hinamList
 	 */
 	public void free(int address) {
-		if (allocatedList.getSize() == 0) {
+		if (killerList.getSize() == 0) {
 			throw new IllegalArgumentException("index must be between 0 and size");
 		}
 
-		Node t=allocatedList.getFirst();
+		Node t  =killerList.getFirst();
 		while(t!=null) {
 			MemoryBlock alo=t.block;
 			if(alo.baseAddress==address)
-			{allocatedList.remove(alo);
-				freeList.addLast(alo);
+			{killerList.remove(alo);
+				hinamList.addLast(alo);
 				return;
 		}t=t.next;}
 	}
@@ -105,7 +105,7 @@ public class MemorySpace {
 	 * for debugging purposes.
 	 */
 	public String toString() {
-		return freeList.toString() + "\n" + allocatedList.toString();		
+		return hinamList.toString() + "\n" + killerList.toString();		
 	}
 	
 	/**
@@ -116,15 +116,15 @@ public class MemorySpace {
 	public void defrag() {
 		
 			
-			if (freeList.getSize() <= 1) {
+			if (hinamList.getSize() <= 1) {
 				return;
 			}
 		
 		
-			freeList.sort();
+			hinamList.sort();
 		
 			
-			Node currentNode = freeList.getFirst();
+			Node currentNode = hinamList.getFirst();
 			while (currentNode != null && currentNode.next != null) {
 				MemoryBlock currentBlock = currentNode.block;
 				MemoryBlock nextBlock = currentNode.next.block;
@@ -132,7 +132,7 @@ public class MemorySpace {
 				
 				if (currentBlock.baseAddress + currentBlock.length == nextBlock.baseAddress) {
 					currentBlock.length += nextBlock.length; 
-					freeList.remove(currentNode.next);       
+					hinamList.remove(currentNode.next);       
 				} else {
 					
 					currentNode = currentNode.next;
